@@ -4,15 +4,12 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.SmsManager
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.activity.ComponentActivity
@@ -92,19 +89,6 @@ class MainActivity : ComponentActivity() {
 class EventReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val eventName = intent.getStringExtra("eventName") ?: "Event"
-        
-        val channelId = "event_channel"
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(channelId, "Event Notifications", NotificationManager.IMPORTANCE_HIGH)
-        notificationManager.createNotificationChannel(channel)
-
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Event Starting!")
-            .setContentText(eventName)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .build()
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
             try {
@@ -315,7 +299,7 @@ fun EventGridView(
                                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, dateObj.time, pendingIntent)
                                 }
 
-                                Toast.makeText(context, "Saved! Alert set for $timeInput", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Saved! SMS alert scheduled.", Toast.LENGTH_SHORT).show()
                             }
                         } catch (_: Exception) {
                             Toast.makeText(context, "Format error. Use MM/dd/yyyy and HH:mm", Toast.LENGTH_LONG).show()
@@ -381,8 +365,8 @@ fun SmsSettingsView(onBack: () -> Unit, onSignOut: () -> Unit) {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED)
     }
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-        isAllowed = map[Manifest.permission.SEND_SMS] ?: false
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        isAllowed = granted
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -391,15 +375,15 @@ fun SmsSettingsView(onBack: () -> Unit, onSignOut: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("SMS & Alerts", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text("SMS Notifications", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(20.dp))
             
             Box(
                 modifier = Modifier.background(Color.Gray.copy(alpha = 0.2f), RoundedCornerShape(10.dp)).padding(15.dp)
             ) {
                 Text(
-                    if (isAllowed) "Status: ENABLED\n\nYou will get texts and notifications for events!" 
-                    else "Status: DISABLED\n\nYou won't get any alerts unless you allow permissions."
+                    if (isAllowed) "Status: ENABLED\n\nYou will get texts for upcoming events!" 
+                    else "Status: DISABLED\n\nYou won't get any texts unless you allow SMS."
                 )
             }
 
@@ -407,9 +391,9 @@ fun SmsSettingsView(onBack: () -> Unit, onSignOut: () -> Unit) {
 
             if (!isAllowed) {
                 Button(onClick = { 
-                    launcher.launch(arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.POST_NOTIFICATIONS)) 
+                    launcher.launch(Manifest.permission.SEND_SMS)
                 }) {
-                    Text("ALLOW UPDATES")
+                    Text("ALLOW SMS UPDATES")
                 }
             } else {
                 Button(onClick = { /* already on */ }, enabled = false) {
