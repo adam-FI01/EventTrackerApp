@@ -3,7 +3,7 @@ Requirements:
   - JDK 21
   - Android SDK Platform 36.1
 
-Steps to run:
+Steps to Run:
   - Clone Repo (I hit an issue when having the repo in my desktop so make sure to add it somewhere else)
   - Let Gradle download and sync
   - Run!
