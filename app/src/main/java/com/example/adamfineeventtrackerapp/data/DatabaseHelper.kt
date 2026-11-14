@@ -53,13 +53,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "event_tracke
         return db.insert("events", null, values)
     }
 
-    fun getAllEvents(): List<MyEvent> {
-        val list = mutableListOf<MyEvent>()
+    fun getAllEvents(): List<Event> {
+        val list = mutableListOf<Event>()
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM events", null)
         if (cursor.moveToFirst()) {
             do {
-                list.add(MyEvent(
+                list.add(Event(
                     cursor.getInt(0),
                     cursor.getString(1),
                     cursor.getString(2),

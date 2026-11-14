@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".EventReminderReceiver" android:exported="false" />
+        <receiver android:name=".reminders.SmsReminderReceiver" android:exported="false" />
     </application>
 
 </manifest>
