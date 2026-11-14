@@ -1,18 +1,15 @@
 package com.example.adamfineeventtrackerapp.data
 
-/**
- * Single entry point for everything account related (login, sign up, lookups).
- * Screens and ViewModels talk to this class instead of the database directly.
- */
+// Handles login and sign up
 class AuthRepository(private val db: DatabaseHelper) {
 
     enum class RegisterResult { SUCCESS, MISSING_FIELDS, USER_EXISTS, FAILED }
 
-    /** Returns true when the username and password match a stored account. */
+    // True if the login is correct
     fun login(username: String, password: String): Boolean =
         db.checkUser(username, password)
 
-    /** Creates a new account if the fields are filled in and the username is free. */
+    // Makes a new account
     fun register(username: String, password: String): RegisterResult {
         if (username.isBlank() || password.isBlank()) return RegisterResult.MISSING_FIELDS
         if (userExists(username)) return RegisterResult.USER_EXISTS

@@ -1,8 +1,6 @@
 package com.example.adamfineeventtrackerapp.data
 
-/**
- * A single event stored in the events table.
- */
+// One event
 data class Event(
     val eventId: Int = 0,
     val eventName: String,

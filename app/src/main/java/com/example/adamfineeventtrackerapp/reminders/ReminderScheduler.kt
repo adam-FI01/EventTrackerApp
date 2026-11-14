@@ -11,11 +11,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-/**
- * Owns all AlarmManager / PendingIntent logic for event reminders.
- * Each event uses its database id as the PendingIntent request code, so
- * re-scheduling an edited event replaces its old alarm.
- */
+// Sets and cancels event reminders
 class ReminderScheduler(context: Context) {
 
     enum class Result { SCHEDULED, NO_PERMISSION, INVALID_DATE }

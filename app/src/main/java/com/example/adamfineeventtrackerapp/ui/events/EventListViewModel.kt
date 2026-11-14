@@ -11,9 +11,7 @@ import com.example.adamfineeventtrackerapp.data.DatabaseHelper
 import com.example.adamfineeventtrackerapp.data.Event
 import com.example.adamfineeventtrackerapp.reminders.ReminderScheduler
 
-/**
- * Loads, adds, edits and deletes events, and keeps their SMS reminders in sync.
- */
+// Event list logic
 class EventListViewModel(
     private val db: DatabaseHelper,
     private val reminderScheduler: ReminderScheduler
@@ -22,7 +20,7 @@ class EventListViewModel(
     var events by mutableStateOf(db.getAllEvents())
         private set
 
-    /** One-time message for the screen to show (e.g. as a Toast), then clear. */
+    // Message to show the user
     var message by mutableStateOf<String?>(null)
         private set
 
@@ -50,7 +48,7 @@ class EventListViewModel(
         events = db.getAllEvents()
     }
 
-    /** Returns the message to show, or null if nothing needs to be said. */
+    // Sets the reminder and picks a message
     private fun scheduleReminder(id: Int, name: String, date: String, time: String, successText: String): String? =
         when (reminderScheduler.schedule(id, name, date, time)) {
             ReminderScheduler.Result.SCHEDULED -> successText

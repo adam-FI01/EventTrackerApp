@@ -9,9 +9,7 @@ import android.telephony.SmsManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 
-/**
- * Fired by AlarmManager when an event is due; sends the SMS reminder.
- */
+// Sends the reminder text
 class SmsReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -33,7 +31,7 @@ class SmsReminderReceiver : BroadcastReceiver() {
         const val EXTRA_EVENT_NAME = "eventName"
         private const val TAG = "SmsReminderReceiver"
 
-        // Emulator phone number used for testing SMS delivery.
+        // Emulator phone number
         private const val REMINDER_PHONE_NUMBER = "5554"
     }
 }

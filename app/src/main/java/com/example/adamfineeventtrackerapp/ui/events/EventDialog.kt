@@ -12,12 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.adamfineeventtrackerapp.data.Event
 
-/**
- * Shared dialog for creating and editing an event. It collects the name, date,
- * time and optional location, then hands them back through [onConfirm].
- *
- * @param initialEvent the event being edited, or null when adding a new one.
- */
+// Add or edit an event (initialEvent is null when adding)
 @Composable
 fun EventDialog(
     title: String,

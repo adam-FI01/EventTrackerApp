@@ -26,9 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/**
- * Login / registration UI. All decisions are delegated to [LoginViewModel].
- */
+// Login screen
 @Composable
 fun LoginView(
     viewModel: LoginViewModel,

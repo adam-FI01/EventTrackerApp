@@ -9,9 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 
-/**
- * Tracks whether SMS reminders are enabled (i.e. SEND_SMS permission is granted).
- */
+// Tracks if SMS is allowed
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
 
     var smsEnabled by mutableStateOf(hasSmsPermission())
