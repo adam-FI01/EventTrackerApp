@@ -10,9 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.adamfineeventtrackerapp.data.AuthRepository
 import com.example.adamfineeventtrackerapp.data.AuthRepository.RegisterResult
 
-/**
- * Holds the login form state and decides whether a user may log in or register.
- */
+// Login logic
 class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     var username by mutableStateOf("")
@@ -20,7 +18,7 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
     var password by mutableStateOf("")
         private set
 
-    /** One-time message for the screen to show (e.g. as a Toast), then clear. */
+    // Message to show the user
     var message by mutableStateOf<String?>(null)
         private set
 

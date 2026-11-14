@@ -40,9 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.adamfineeventtrackerapp.data.Event
 
-/**
- * Grid of the user's events. Only renders UI; all data work goes through [EventListViewModel].
- */
+// Event list screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventListScreen(

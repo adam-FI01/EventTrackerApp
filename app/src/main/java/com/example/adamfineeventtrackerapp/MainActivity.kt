@@ -19,10 +19,7 @@ import com.example.adamfineeventtrackerapp.ui.settings.SettingsScreen
 import com.example.adamfineeventtrackerapp.ui.settings.SettingsViewModel
 import com.example.adamfineeventtrackerapp.ui.theme.AdamFineEventTrackerAppTheme
 
-/**
- * App entry point: creates the shared dependencies and wires up navigation
- * between the login, event list and settings screens.
- */
+// Sets up the app and the screens
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

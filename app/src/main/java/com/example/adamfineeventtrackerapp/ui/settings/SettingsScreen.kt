@@ -26,9 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/**
- * SMS notification settings and sign out. UI only; state lives in [SettingsViewModel].
- */
+// Settings screen
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
