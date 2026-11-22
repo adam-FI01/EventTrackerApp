@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.adamfineeventtrackerapp.data.AuthRepository
 import com.example.adamfineeventtrackerapp.data.DatabaseHelper
+import com.example.adamfineeventtrackerapp.data.EventRepository
 import com.example.adamfineeventtrackerapp.reminders.ReminderScheduler
 import com.example.adamfineeventtrackerapp.ui.events.EventListScreen
 import com.example.adamfineeventtrackerapp.ui.events.EventListViewModel
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
 
         val db = DatabaseHelper(applicationContext)
         val authRepository = AuthRepository(db)
+        val eventRepository = EventRepository(db)
         val reminderScheduler = ReminderScheduler(applicationContext)
 
         setContent {
@@ -44,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
                     composable(ROUTE_EVENTS) {
                         EventListScreen(
-                            viewModel = viewModel(factory = EventListViewModel.factory(db, reminderScheduler)),
+                            viewModel = viewModel(factory = EventListViewModel.factory(eventRepository, reminderScheduler)),
                             onOpenSettings = { navController.navigate(ROUTE_SETTINGS) }
                         )
                     }
