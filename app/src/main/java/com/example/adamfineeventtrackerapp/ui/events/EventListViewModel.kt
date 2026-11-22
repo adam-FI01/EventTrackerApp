@@ -7,37 +7,74 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.adamfineeventtrackerapp.data.DatabaseHelper
-import com.example.adamfineeventtrackerapp.data.Event
+import com.example.adamfineeventtrackerapp.data.EventListItem
+import com.example.adamfineeventtrackerapp.data.EventRepository
 import com.example.adamfineeventtrackerapp.reminders.ReminderScheduler
 
 // Event list logic
 class EventListViewModel(
-    private val db: DatabaseHelper,
+    private val repository: EventRepository,
     private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
 
-    var events by mutableStateOf(db.getAllEvents())
+    var searchQuery by mutableStateOf("")
+        private set
+
+    // true = upcoming; false = past
+    // TLDR: this is the binary switch
+    var showUpcoming by mutableStateOf(true)
+        private set
+
+    var events by mutableStateOf<List<EventListItem>>(emptyList())
         private set
 
     // Message to show the user
     var message by mutableStateOf<String?>(null)
         private set
 
-    fun addEvent(name: String, date: String, time: String, location: String) {
-        val newId = db.addEvent(name, date, time, location).toInt()
+    init {
+        repository.loadEvents()
         refreshEvents()
-        message = scheduleReminder(newId, name, date, time, successText = "Saved! SMS alert scheduled.")
+    }
+
+    fun onSearchQueryChange(query: String) {
+        searchQuery = query
+        refreshEvents()
+
+        // Switch tabs if the other one has matches
+        // added because it looked cleaner from the UI perspective
+        if (events.isEmpty() && query.isNotBlank()) {
+            val otherTab = repository.search(query, !showUpcoming)
+            if (otherTab.isNotEmpty()) {
+                showUpcoming = !showUpcoming
+                events = otherTab
+            }
+        }
+    }
+
+    fun onShowUpcomingChange(upcoming: Boolean) {
+        showUpcoming = upcoming
+        refreshEvents()
+    }
+
+    fun addEvent(name: String, date: String, time: String, location: String) {
+        val newId = repository.addEvent(name, date, time, location)
+        refreshEvents()
+        message = if (newId == null) {
+            "Could not save event. Please try again."
+        } else {
+            scheduleReminder(newId, name, date, time, successText = "Saved! SMS alert scheduled.")
+        }
     }
 
     fun updateEvent(id: Int, name: String, date: String, time: String, location: String) {
-        db.updateEvent(id, name, date, time, location)
+        repository.updateEvent(id, name, date, time, location)
         refreshEvents()
         message = scheduleReminder(id, name, date, time, successText = "Updated! SMS alert rescheduled.")
     }
 
     fun deleteEvent(id: Int) {
-        db.deleteEvent(id)
+        repository.deleteEvent(id)
         reminderScheduler.cancel(id)
         refreshEvents()
     }
@@ -45,7 +82,7 @@ class EventListViewModel(
     fun onMessageShown() { message = null }
 
     private fun refreshEvents() {
-        events = db.getAllEvents()
+        events = repository.search(searchQuery, showUpcoming)
     }
 
     // Sets the reminder and picks a message
@@ -57,9 +94,9 @@ class EventListViewModel(
         }
 
     companion object {
-        fun factory(db: DatabaseHelper, reminderScheduler: ReminderScheduler): ViewModelProvider.Factory =
+        fun factory(repository: EventRepository, reminderScheduler: ReminderScheduler): ViewModelProvider.Factory =
             viewModelFactory {
-                initializer { EventListViewModel(db, reminderScheduler) }
+                initializer { EventListViewModel(repository, reminderScheduler) }
             }
     }
 }

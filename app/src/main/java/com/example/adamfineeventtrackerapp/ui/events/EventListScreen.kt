@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -14,14 +16,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.adamfineeventtrackerapp.data.Event
+import com.example.adamfineeventtrackerapp.data.EventListItem
 
 // Event list screen
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,17 +85,44 @@ fun EventListScreen(
             Text("Upcoming Schedule", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+            OutlinedTextField(
+                value = viewModel.searchQuery,
+                onValueChange = viewModel::onSearchQueryChange,
+                label = { Text("Search events") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row {
+                FilterChip(
+                    selected = viewModel.showUpcoming,
+                    onClick = { viewModel.onShowUpcomingChange(true) },
+                    label = { Text("Upcoming") }
+                )
+                Spacer(Modifier.width(8.dp))
+                FilterChip(
+                    selected = !viewModel.showUpcoming,
+                    onClick = { viewModel.onShowUpcomingChange(false) },
+                    label = { Text("Past") }
+                )
+            }
+
+            if (viewModel.events.isEmpty()) {
+                Text("No events found", modifier = Modifier.padding(top = 16.dp))
+            }
+
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(5.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(viewModel.events, key = { it.eventId }) { event ->
+                items(viewModel.events, key = { it.event.eventId }) { item ->
                     EventCard(
-                        event = event,
-                        onEdit = { eventBeingEdited = event },
-                        onDelete = { viewModel.deleteEvent(event.eventId) }
+                        item = item,
+                        onEdit = { eventBeingEdited = item.event },
+                        onDelete = { viewModel.deleteEvent(item.event.eventId) }
                     )
                 }
             }
@@ -125,7 +158,7 @@ fun EventListScreen(
 
 @Composable
 private fun EventCard(
-    event: Event,
+    item: EventListItem,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -134,10 +167,9 @@ private fun EventCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(event.eventName, fontWeight = FontWeight.Bold, color = Color(0xFF90CAF9))
-            Text("Date: ${event.eventDate}", fontSize = 12.sp)
-            Text("Time: ${event.eventTime}", fontSize = 12.sp)
-            Text("Loc: ${event.eventLocation}", fontSize = 12.sp)
+            Text(item.event.eventName, fontWeight = FontWeight.Bold, color = Color(0xFF90CAF9))
+            Text(item.readableDate, fontSize = 12.sp)
+            Text("Loc: ${item.event.eventLocation}", fontSize = 12.sp)
 
             Row(modifier = Modifier.align(Alignment.End)) {
                 IconButton(onClick = onEdit) {

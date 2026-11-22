@@ -7,9 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.adamfineeventtrackerapp.data.EventDates
 
 // Sets and cancels event reminders
 class ReminderScheduler(context: Context) {
@@ -22,7 +20,7 @@ class ReminderScheduler(context: Context) {
     fun schedule(eventId: Int, eventName: String, date: String, time: String): Result {
         if (!hasSmsPermission()) return Result.NO_PERMISSION
 
-        val triggerAt = parseDateTime(date, time) ?: return Result.INVALID_DATE
+        val triggerAt = EventDates.parse(date, time) ?: return Result.INVALID_DATE
         val pendingIntent = buildPendingIntent(eventId, eventName)
 
         if (alarmManager.canScheduleExactAlarms()) {
@@ -41,12 +39,6 @@ class ReminderScheduler(context: Context) {
         ContextCompat.checkSelfPermission(appContext, Manifest.permission.SEND_SMS) ==
             PackageManager.PERMISSION_GRANTED
 
-    private fun parseDateTime(date: String, time: String): Long? = try {
-        SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault()).parse("$date $time")?.time
-    } catch (_: ParseException) {
-        null
-    }
-
     private fun buildPendingIntent(eventId: Int, eventName: String?): PendingIntent {
         val intent = Intent(appContext, SmsReminderReceiver::class.java).apply {
             if (eventName != null) putExtra(SmsReminderReceiver.EXTRA_EVENT_NAME, eventName)
@@ -57,9 +49,5 @@ class ReminderScheduler(context: Context) {
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-    }
-
-    companion object {
-        const val DATE_TIME_PATTERN = "MM/dd/yyyy HH:mm"
     }
 }
